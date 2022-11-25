@@ -23,7 +23,7 @@ from utils.util_distortion import CenterPad, Normalize, RGB2Lab, ToTensor
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-torch.cuda.set_device(0)
+device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def colorize_video(opt, input_path, reference_file, output_path, nonlocal_net, colornet, vggnet):
@@ -54,7 +54,7 @@ def colorize_video(opt, input_path, reference_file, output_path, nonlocal_net, c
     total_time = 0
     I_last_lab_predict = None
 
-    IB_lab_large = transform(frame_ref).unsqueeze(0).cuda()
+    IB_lab_large = transform(frame_ref).unsqueeze(0).to(device)
     IB_lab = torch.nn.functional.interpolate(IB_lab_large, scale_factor=0.5, mode="bilinear")
     IB_l = IB_lab[:, 0:1, :, :]
     IB_ab = IB_lab[:, 1:3, :, :]
@@ -67,7 +67,7 @@ def colorize_video(opt, input_path, reference_file, output_path, nonlocal_net, c
 
     for index, frame_name in enumerate(tqdm(filenames)):
         frame1 = Image.open(os.path.join(input_path, frame_name))
-        IA_lab_large = transform(frame1).unsqueeze(0).cuda()
+        IA_lab_large = transform(frame1).unsqueeze(0).to(device)
         IA_lab = torch.nn.functional.interpolate(IA_lab_large, scale_factor=0.5, mode="bilinear")
 
         IA_l = IA_lab[:, 0:1, :, :]
@@ -77,7 +77,7 @@ def colorize_video(opt, input_path, reference_file, output_path, nonlocal_net, c
             if opt.frame_propagate:
                 I_last_lab_predict = IB_lab
             else:
-                I_last_lab_predict = torch.zeros_like(IA_lab).cuda()
+                I_last_lab_predict = torch.zeros_like(IA_lab).to(device)
 
         # start the frame colorization
         with torch.no_grad():
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     nonlocal_net = WarpNet(1)
     colornet = ColorVidNet(7)
     vggnet = VGG19_pytorch()
-    vggnet.load_state_dict(torch.load("data/vgg19_conv.pth"))
+    vggnet.load_state_dict(torch.load("data/vgg19_conv.pth", map_location='cpu'))
     for param in vggnet.parameters():
         param.requires_grad = False
 
@@ -155,15 +155,15 @@ if __name__ == "__main__":
     color_test_path = os.path.join("checkpoints/", "video_moredata_l1/colornet_iter_76000.pth")
     print("succesfully load nonlocal model: ", nonlocal_test_path)
     print("succesfully load color model: ", color_test_path)
-    nonlocal_net.load_state_dict(torch.load(nonlocal_test_path))
-    colornet.load_state_dict(torch.load(color_test_path))
+    nonlocal_net.load_state_dict(torch.load(nonlocal_test_path, map_location='cpu'))
+    colornet.load_state_dict(torch.load(color_test_path, map_location='cpu'))
 
     nonlocal_net.eval()
     colornet.eval()
     vggnet.eval()
-    nonlocal_net.cuda()
-    colornet.cuda()
-    vggnet.cuda()
+    nonlocal_net.to(device)
+    colornet.to(device)
+    vggnet.to(device)
 
     for ref_name in refs:
         try:

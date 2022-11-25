@@ -286,7 +286,7 @@ def load_data():
         batch_size=opt.batch_size,
         shuffle=False,
         num_workers=opt.workers,
-        pin_memory=True,
+        pin_memory=False,
         drop_last=True,
         sampler=sampler,
     )
