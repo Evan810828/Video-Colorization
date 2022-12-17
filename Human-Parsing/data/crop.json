@@ -1,0 +1,38 @@
+{
+  "root": [
+    {
+      "dataset": "CIHP",
+      "im_name": "demo.jpg",
+      "img_height": 900,
+      "img_width": 1200,
+      "center": [
+        450.0,
+        600.0
+      ],
+      "person_num": 1,
+      "person_bbox": [
+        [
+          0,
+          0,
+          1200,
+          900
+        ]
+      ],
+      "real_person_bbox": [
+        [
+          0,
+          0,
+          1200,
+          900
+        ]
+      ],
+      "person_bbox_score": [
+        0.9992548823356628
+      ],
+      "bbox_name": [
+        "demo.jpg"
+      ],
+      "mask_name": "demo_mask.npy"
+    }
+  ]
+}
