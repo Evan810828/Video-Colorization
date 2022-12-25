@@ -98,8 +98,7 @@ def main():
     multi_scales = [float(i) for i in args.multi_scales.split(',')]
     gpus = [int(i) for i in args.gpu.split(',')]
     assert len(gpus) == 1
-    if not args.gpu == 'None':
-        os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+    os.environ["CUDA_VISIBLE_DEVICES"] = "20"
 
     cudnn.benchmark = True
     cudnn.enabled = True

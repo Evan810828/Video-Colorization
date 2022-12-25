@@ -21,5 +21,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("upload/", views.upload, name="upload"),
     path("segmentation/", views.segmentation, name="segmentation"),
-    path("download/", views.download, name="download"),
+    path("colorize/", views.colorize, name="colorize"),
 ]
